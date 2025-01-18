@@ -1,0 +1,36 @@
+services:
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-crypto
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - postgres
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5433
+      - DB_DATABASE=cryptomonnaie
+      - DB_USERNAME=cryptomonnaie
+      - DB_PASSWORD=cryptomonnaie
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-crypto
+    restart: always
+    environment:
+      POSTGRES_DB: cryptomonnaie
+      POSTGRES_USER: cryptomonnaie
+      POSTGRES_PASSWORD: cryptomonnaie
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d/pg_cron.sql
+    ports:
+      - "5433:5432"
+
+volumes:
+  postgres_data:

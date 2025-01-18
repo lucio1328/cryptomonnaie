@@ -1,0 +1,89 @@
+/* Global Styles */
+body {
+    background-color: #f5f5f5; /* Light gray */
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(45deg, #4e73df, #1cc88a);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white !important;
+}
+
+.nav-link {
+    color: white !important;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #d1ecf1 !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #1cc88a;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(28, 200, 138, 0.4);
+}
+
+/* Tables */
+.table {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+    background-color: #4e73df;
+    color: white;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Forms */
+.form-label {
+    font-weight: bold;
+    color: #4e73df;
+}
+
+.form-control {
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    background-color: #4e73df;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 20px;
+}

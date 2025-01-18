@@ -1,0 +1,130 @@
+/* En-tête */
+header {
+    background-color: #1D4ED8; /* Bleu foncé */
+    color: white;
+    padding: 1rem 2rem;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+header .flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Boutons dans l'en-tête */
+a {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* Bouton Connexion */
+a[href*="login"] {
+    background-color: #3B82F6; /* Bleu */
+}
+
+a[href*="login"]:hover {
+    background-color: #2563EB; /* Bleu foncé */
+}
+
+/* Bouton Inscription */
+a[href*="register"] {
+    background-color: #10B981; /* Vert */
+}
+
+a[href*="register"]:hover {
+    background-color: #059669; /* Vert foncé */
+}
+
+/* Section principale */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Titres */
+h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1E293B; /* Gris foncé */
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2563EB; /* Bleu */
+}
+
+/* Section Fonctionnalités */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+.bg-white {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.bg-white:hover {
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.text-gray-600 {
+    color: #4B5563;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.mt-12 {
+    margin-top: 3rem;
+}
+
+/* Mobile Friendly */
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+}
