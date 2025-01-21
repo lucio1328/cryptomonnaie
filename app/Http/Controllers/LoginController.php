@@ -14,45 +14,73 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'mot_de_passe');
+        try {
 
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('/dashboard');
+            // Appel à l'API Java pour vérifier les identifiants
+            $response = Http::asForm()->post('http://localhost:8081/api/check-login', [
+                'email' => $request->input('email'),
+                'motDePasse' => $request->input('password'),
+            ]);
+
+            // Si la réponse est réussie
+            if ($response->successful()) {
+
+                $data = $response->json();
+
+                // Extraire les informations utilisateurreturn redirect()->route('confirmPin')->with('success', $message);
+                $utilisateur = $data['data'];
+                $message = $data['message'];
+
+                // Stocker les données utilisateur dans la session Laravel
+                session([
+                    'utilisateur_id' => $utilisateur['idUtilisateur'],
+                    'utilisateur_nom' => $utilisateur['nom'],
+                    'utilisateur_email' => $utilisateur['email'],
+                ]);
+
+
+                // Rediriger vers le tableau de bord avec un message de succès
+                return redirect()->route('confirmPin')->with('success', $message);
+                // return redirect()->intended('/dashboard')->with('success', $message);
+            }
+
+            // Si une erreur est renvoyée par l'API
+            return back()->withErrors([
+                'email' => $response->json('error', 'Une erreur est survenue lors de l\'authentification.'),
+            ]);
+            // dd($response->status(), $response->json());
+
+
+        } catch (\Exception $e) {
+            // En cas d'erreur de connexion ou d'exception
+            return back()->withErrors([
+                'email' => 'Une erreur interne est survenue : ' . $e->getMessage(),
+            ]);
         }
-
-        return back()->withErrors([
-            'email' => 'Les informations d\'identification ne correspondent pas.',
-        ]);
     }
+
 
     public function register(Request $request)
     {
-        // Validation des entrées
-        $validated = $request->validate([
-            'nom' => 'required|string|max:255',
-            'email' => 'required|email',
-            'motDePasse' => 'required|string|min:6',
-            'confirmMotDePasse' => 'required|string|min:6|same:motDePasse',
+
+        $response = Http::asForm()->post('http://localhost:8081/api/pre-inscription', [
+            'nom' => $request->input('name'),
+            'email' => $request->input('email'),
+            'motDePasse' => $request->input('password'),
+            'confirmMotDePasse' => $request->input('password_confirmation'),
         ]);
 
-        // Appel à l'API Java
-        $response = Http::get('http://localhost:8080/api/pre-inscription', [
-            'nom' => $validated['nom'],
-            'email' => $validated['email'],
-            'motDePasse' => $validated['motDePasse'],
-            'confirmMotDePasse' => $validated['confirmMotDePasse'],
-        ]);
-
-        // Vérification de la réponse
         if ($response->successful()) {
             return redirect()
                 ->route('register')
                 ->with('success', 'Pré-inscription réussie. Vérifiez votre email pour la validation.');
         }
 
-        // En cas d'erreur
         return redirect()
             ->route('register')
             ->with('error', 'Échec de la pré-inscription : ' . $response->body());
     }
+
+
+
 }
