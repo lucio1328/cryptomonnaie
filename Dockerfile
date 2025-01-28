@@ -10,13 +10,15 @@ RUN apt-get update && apt-get install -y \
 # Installer Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Installer les dépendances Laravel
+# Copier le code source
 WORKDIR /var/www/html
 COPY . .
-RUN composer install
+
+# Installer les dépendances
+RUN composer install --no-dev --optimize-autoloader
 
 # Donner les permissions nécessaires
 RUN chmod -R 775 storage bootstrap/cache
 
-# Lancer Laravel
-CMD php artisan serve --host=0.0.0.0 --port=80
+# Ajouter une commande combinée pour générer la clé et lancer Laravel
+CMD ["sh", "-c", "php artisan key:generate && php artisan serve --host=0.0.0.0 --port=80"]
