@@ -85,23 +85,26 @@
         <h2>Entrez votre Code PIN</h2>
         <p style="color: #ccc">Nous vous avons envoyé le code par email</p>
         <div class="pin-inputs">
-            <!-- Modifié pour 4 champs -->
             <input type="text" maxlength="1" class="pin-input" oninput="moveNext(this)">
             <input type="text" maxlength="1" class="pin-input" oninput="moveNext(this)">
             <input type="text" maxlength="1" class="pin-input" oninput="moveNext(this)">
-            <input type="text" maxlength="1" class="pin-input" oninput="moveNext(this)">
+            <input type="text" maxlength="1" class="pin-input" id="last-input" oninput="moveNext(this, true)">
         </div>
-        <button onclick="verifyPin()">Confirmer</button>
+
         <p id="message" class="message"></p>
     </div>
 
     <script>
         // Fonction pour passer automatiquement au champ suivant
-        function moveNext(input) {
+        function moveNext(input, isLast = false) {
             if (input.value.length === 1) {
-                const nextInput = input.nextElementSibling;
-                if (nextInput && nextInput.classList.contains('pin-input')) {
-                    nextInput.focus();
+                if (isLast) {
+                    verifyPin(); // Appeler directement verifyPin() lorsque le dernier champ est rempli
+                } else {
+                    const nextInput = input.nextElementSibling;
+                    if (nextInput && nextInput.classList.contains('pin-input')) {
+                        nextInput.focus();
+                    }
                 }
             } else if (input.value.length === 0) {
                 const prevInput = input.previousElementSibling;
@@ -110,6 +113,7 @@
                 }
             }
         }
+
 
         // Fonction pour vérifier le code PIN
         function verifyPin() {
@@ -137,7 +141,6 @@
                         } else {
                             message.textContent = "✔️ " + data.message;
                             message.className = "message success";
-
                             // Rediriger l'utilisateur vers la page d'accueil ou une autre page après succès
                             setTimeout(() => {
                                 window.location.href =
