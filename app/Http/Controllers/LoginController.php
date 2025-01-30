@@ -24,7 +24,6 @@ class LoginController extends Controller
             $data = $response->json();
             // Si la réponse est réussie
             if ($response->successful()) {
-
                 // Extraire les informations utilisateurreturn redirect()->route('confirmPin')->with('success', $message);
                 $utilisateur = $data['data'];
                 $message = $data['message'];
