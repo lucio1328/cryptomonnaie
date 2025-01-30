@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="{{ asset('css/connection.css') }}" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <h1>Connexion à votre compte</h1>
         <p class="text-center text-gray-600 mb-6">Connectez-vous pour accéder à votre espace personnel.</p>
-
-        @if(session('error'))
-            <div class="alert alert-danger">
-                <p class="text-red-500 text-center">{{ session('error') }}</p>
-            </div>
-        @endif
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
@@ -30,9 +26,15 @@
             </div>
             <button type="submit" class="submit-btn">Se connecter</button>
         </form>
+        @error('email')
+            <div class="alert alert-danger">
+                <p class="text-red-500 text-center">{{ $message }}</p>
+            </div>
+        @enderror
 
         <div class="mt-4 text-center">
-            <p>Vous n'avez pas de compte ? <a href="{{ route('register') }}" class="text-blue-500">Inscrivez-vous ici</a></p>
+            <p>Vous n'avez pas de compte ? <a href="{{ route('register') }}" class="text-blue-500">Inscrivez-vous
+                    ici</a></p>
         </div>
 
         <!-- Lien vers la page d'accueil -->
@@ -41,4 +43,5 @@
         </div>
     </div>
 </body>
+
 </html>

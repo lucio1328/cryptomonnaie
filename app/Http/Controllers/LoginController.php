@@ -21,11 +21,9 @@ class LoginController extends Controller
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
             ]);
-
+            $data = $response->json();
             // Si la réponse est réussie
             if ($response->successful()) {
-
-                $data = $response->json();
 
                 // Extraire les informations utilisateurreturn redirect()->route('confirmPin')->with('success', $message);
                 $utilisateur = $data['data'];
@@ -38,7 +36,6 @@ class LoginController extends Controller
                     'utilisateur_email' => $utilisateur['email'],
                 ]);
 
-
                 // Rediriger vers le tableau de bord avec un message de succès
                 return redirect()->route('confirmPin')->with('success', $message);
                 // return redirect()->intended('/dashboard')->with('success', $message);
@@ -46,7 +43,7 @@ class LoginController extends Controller
 
             // Si une erreur est renvoyée par l'API
             return back()->withErrors([
-                'email' => $response->json('error', 'Une erreur est survenue lors de l\'authentification.'),
+                'email' => $data['error'],
             ]);
             // dd($response->status(), $response->json());
 
