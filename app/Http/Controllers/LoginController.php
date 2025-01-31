@@ -51,23 +51,39 @@ class LoginController extends Controller
 
     public function register(Request $request)
     {
+        try {
+            // Validation des entrées
+            $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email',
+                'password' => 'required|min:6|confirmed',
+            ]);
 
-        $response = Http::asForm()->post('http://localhost:8081/api/pre-inscription', [
-            'nom' => $request->input('name'),
-            'email' => $request->input('email'),
-            'motDePasse' => $request->input('password'),
-            'confirmMotDePasse' => $request->input('password_confirmation'),
-        ]);
+            // Appel à l'API Java pour la pré-inscription
+            $response = Http::asForm()->post('http://localhost:8081/api/pre-inscription', [
+                'nom' => $request->input('name'),
+                'email' => $request->input('email'),
+                'motDePasse' => $request->input('password'),
+                'confirmMotDePasse' => $request->input('password_confirmation'),
+            ]);
 
-        if ($response->successful()) {
-            return redirect()
-                ->route('register')
-                ->with('success', 'Pré-inscription réussie. Vérifiez votre email pour la validation.');
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pré-inscription réussie. Vérifiez votre email pour la validation.',
+                ], 200);
+            }
+
+            return response()->json([
+                'success' => false,
+                's' => 'Échec de la pré-inscription : ' . $response->body(),
+            ], $response->status());
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Une erreur interne est survenue : ' . $e->getMessage(),
+            ], 500);
         }
-
-        return redirect()
-            ->route('register')
-            ->with('error', 'Échec de la pré-inscription : ' . $response->body());
     }
 
 
