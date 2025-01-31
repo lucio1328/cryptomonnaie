@@ -15,45 +15,38 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-            // Appel à l'API Java pour vérifier les identifiants
             $response = Http::asForm()->post('http://localhost:8081/api/check-login', [
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
             ]);
+
             $data = $response->json();
-            // Si la réponse est réussie
+
             if ($response->successful()) {
-                // Extraire les informations utilisateurreturn redirect()->route('confirmPin')->with('success', $message);
-                $utilisateur = $data['data'];
-                $message = $data['message'];
-
-                // Stocker les données utilisateur dans la session Laravel
-                session([
-                    'utilisateur_id' => $utilisateur['idUtilisateur'],
-                    'utilisateur_nom' => $utilisateur['nom'],
-                    'utilisateur_email' => $utilisateur['email'],
-                ]);
-
-                // Rediriger vers le tableau de bord avec un message de succès
-                return redirect()->route('confirmPin')->with('success', $message);
-                // return redirect()->intended('/dashboard')->with('success', $message);
+                return response()->json([
+                    'success' => true,
+                    'message' => $data['message'],
+                    'user' => $data['data'],
+                ], 200);
             }
 
-            // Si une erreur est renvoyée par l'API
-            return back()->withErrors([
-                'email' => $data['error'],
-            ]);
-            // dd($response->status(), $response->json());
-
-
+            return response()->json([
+                'success' => false,
+                'error' => $data['error'] ?? 'Identifiants incorrects',
+            ], $response->status());
         } catch (\Exception $e) {
-            // En cas d'erreur de connexion ou d'exception
-            return back()->withErrors([
-                'email' => 'Une erreur interne est survenue : ' . $e->getMessage(),
-            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'Une erreur interne est survenue : ' . $e->getMessage(),
+            ], 500);
         }
     }
+
 
 
     public function register(Request $request)

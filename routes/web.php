@@ -43,7 +43,7 @@ Route::prefix('portefeuilles')->group(function () {
 
 Route::get('/fond/confirmation/{id}', [PortefeuilleController::class, 'confirmFonds'])->name('fonds.confirmation');
 
-Route::prefix('transactions')->group(function() {
+Route::prefix('transactions')->group(function () {
     Route::get('/form', [TransactionController::class, 'create'])->name('transactions.form');
     Route::post('/store', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('/vente/{idUtilisateur}', [TransactionController::class, 'vente'])->name('transactions.vente');
@@ -51,6 +51,6 @@ Route::prefix('transactions')->group(function() {
     Route::get('/historique', [TransactionController::class, 'historique'])->name('transactions.historique');
 });
 
-Route::get('/confirmCodePin', function() {
+Route::get('/confirmCodePin', function () {
     return view('confirmPIN');
 })->name('confirmPin');
