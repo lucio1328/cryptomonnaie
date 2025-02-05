@@ -51,3 +51,6 @@ Route::prefix('transactions')->group(function() {
     Route::get('/historique', [TransactionController::class, 'historique'])->name('transactions.historique');
 });
 
+Route::get('/confirmCodePin', function() {
+    return view('confirmPIN');
+})->name('confirmPin');
