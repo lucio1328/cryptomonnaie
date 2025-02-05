@@ -4,6 +4,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\PortefeuilleController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
@@ -61,3 +62,5 @@ Route::get('/csrf-token', function () {
 });
 
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
+
+Route::post('/user-validated', [WebhookController::class, 'userValidated']);
