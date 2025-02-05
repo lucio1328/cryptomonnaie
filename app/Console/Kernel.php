@@ -8,13 +8,13 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     protected $commands = [
-        // Vos commandes artisan ici
+        \App\Console\Commands\GenerateCryptoPrices::class,
     ];
 
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('crypto:generate-course')
-                 ->everyTenSeconds()
+        $schedule->command('generate:crypto-prices')
+                 ->everyMinute()
                  ->appendOutputTo(storage_path('logs/crypto.log'));
     }
 
