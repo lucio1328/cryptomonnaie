@@ -10,10 +10,11 @@ class WebhookController extends Controller
     public function userValidated(Request $request)
     {
         try {
-            // Vérification des données reçues
+
+            // Validation manuelle
             $validatedData = $request->validate([
                 'email' => 'required|email',
-                'name' => 'required|string',
+                'name' => 'required',
             ]);
 
             // Vérifier si l'utilisateur existe déjà
@@ -23,7 +24,7 @@ class WebhookController extends Controller
                 try {
                     // Créer l'utilisateur dans la base de P2
                     $user = Utilisateur::create([
-                        'name' => $validatedData['name'],
+                        'nom' => $validatedData['name'],
                         'email' => $validatedData['email'],
                     ]);
                 } catch (\Exception $e) {

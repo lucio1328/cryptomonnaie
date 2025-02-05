@@ -63,4 +63,15 @@ Route::get('/csrf-token', function () {
 
 Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
-Route::post('/user-validated', [WebhookController::class, 'userValidated']);
+Route::get('/user-validated', [WebhookController::class, 'userValidated']);
+Route::get('/logout', [LoginController::class, 'logout']);
+
+Route::get('/test-session', function (\Illuminate\Http\Request $request) {
+    session(['test' => 'session working']);
+    return response()->json(['message' => 'Session set!']);
+});
+
+Route::get('/check-session', function (\Illuminate\Http\Request $request) {
+    return response()->json(['session_value' => session('test')]);
+});
+

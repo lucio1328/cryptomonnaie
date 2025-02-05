@@ -56,7 +56,7 @@ class LoginController extends Controller
             $request->validate([
                 'name' => 'required|string',
                 'email' => 'required|email',
-                'password' => 'required|min:6|confirmed',
+                'password' => 'required|confirmed',
             ]);
 
             // Appel à l'API Java pour la pré-inscription
@@ -84,6 +84,18 @@ class LoginController extends Controller
                 'error' => 'Une erreur interne est survenue : ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function logout()
+    {
+        // Vider la session
+        session()->flush();
+
+        // Optionnel : Supprimer le cookie de session
+        session()->forget('laravel_session');
+
+        // Rediriger vers la page d'accueil ou une page de connexion
+        return redirect('/');
     }
 
 

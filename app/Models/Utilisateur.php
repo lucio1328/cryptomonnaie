@@ -13,12 +13,8 @@ class Utilisateur extends Model
     protected $fillable = [
         'nom',
         'email',
-        'mot_de_passe'
     ];
 
-    protected $hidden = [
-        'mot_de_passe',
-    ];
 
     protected $primaryKey = 'id_utilisateur';
 }

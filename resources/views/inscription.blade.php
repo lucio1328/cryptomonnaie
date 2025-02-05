@@ -27,7 +27,7 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
             <div class="mb-4">
-                <label for="name">Nom complet</label>
+                <label for="name">Nom completggdf</label>
                 <input type="text" name="name" id="name" class="input-field" required>
             </div>
             <div class="mb-4">
