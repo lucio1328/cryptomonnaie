@@ -8,16 +8,17 @@ services:
       - "8000:80"
     volumes:
       - .:/var/www/html
-      - /var/www/html/vendor
     depends_on:
       - postgres
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=postgres
-      - DB_PORT=5433
+      - DB_PORT=5432
       - DB_DATABASE=cryptomonnaie
       - DB_USERNAME=cryptomonnaie
       - DB_PASSWORD=cryptomonnaie
+    networks:
+      - cryptomonnaie-network
 
   postgres:
     image: postgres:15
@@ -29,9 +30,28 @@ services:
       POSTGRES_PASSWORD: cryptomonnaie
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres:/docker-entrypoint-initdb.d/pg_cron.sql
+      - ./docker/postgres:/docker-entrypoint-initdb.d
     ports:
       - "5433:5432"
+    networks:
+      - cryptomonnaie-network
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx-laravel
+    ports:
+      - "8800:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - laravel
+    networks:
+      - cryptomonnaie-network
 
 volumes:
   postgres_data:
+
+networks:
+  cryptomonnaie-network:
+    driver: bridge

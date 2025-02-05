@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Installer les extensions nécessaires
+# Installer les extensions et Supervisor
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -18,7 +18,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Donner les permissions nécessaires
-RUN chmod -R 775 storage bootstrap/cache
+RUN chmod -R 755 .
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Ajouter une commande combinée pour générer la clé et lancer Laravel
-CMD ["sh", "-c", "php artisan key:generate && php artisan serve --host=0.0.0.0 --port=80"]
+CMD php artisan generate:crypto-prices && php-fpm

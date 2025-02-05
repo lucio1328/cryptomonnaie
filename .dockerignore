@@ -1,0 +1,25 @@
+# Fichiers générés par l'OS Windows
+Thumbs.db
+desktop.ini
+
+# Fichiers temporaires
+*.bak
+*.swp
+*.swo
+*.log
+
+# Dossiers liés aux dépendances Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Exclure Dockerfile et .dockerignore
+Dockerfile
+.dockerignore
+
+# Ignorer les fichiers de configuration sensibles
+.env
+
+# Dossiers temporaires de composer ou d'autres outils
+/vendor
+/.composer

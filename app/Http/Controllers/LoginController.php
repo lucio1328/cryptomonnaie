@@ -17,7 +17,7 @@ class LoginController extends Controller
         try {
 
             // Appel à l'API Java pour vérifier les identifiants
-            $response = Http::asForm()->post('http://localhost:8081/api/check-login', [
+            $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/check-login', [
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
             ]);
@@ -48,14 +48,13 @@ class LoginController extends Controller
             return back()->withErrors([
                 'email' => $response->json('error', 'Une erreur est survenue lors de l\'authentification.'),
             ]);
-            // dd($response->status(), $response->json());
+            dd($response->status(), $response->json());
 
 
         } catch (\Exception $e) {
             // En cas d'erreur de connexion ou d'exception
-            return back()->withErrors([
-                'email' => 'Une erreur interne est survenue : ' . $e->getMessage(),
-            ]);
+            echo($e->getMessage());
+            
         }
     }
 
@@ -63,7 +62,7 @@ class LoginController extends Controller
     public function register(Request $request)
     {
 
-        $response = Http::asForm()->post('http://localhost:8081/api/pre-inscription', [
+        $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/pre-inscription', [
             'nom' => $request->input('name'),
             'email' => $request->input('email'),
             'motDePasse' => $request->input('password'),

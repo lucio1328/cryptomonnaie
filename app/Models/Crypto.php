@@ -24,4 +24,8 @@ class Crypto extends Model
         'pourcentage' => 'decimal:2',
         'prix_actuel' => 'decimal:2',
     ];
+
+    public function historiqueCours() {
+        return $this->hasMany(HistoriqueCours::class, 'id_cryptos');
+    }
 }
