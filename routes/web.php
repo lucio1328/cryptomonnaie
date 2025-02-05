@@ -5,6 +5,7 @@ use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\PortefeuilleController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 // Route pour la page d'accueil
 Route::get('/', function () {
@@ -54,3 +55,9 @@ Route::prefix('transactions')->group(function () {
 Route::get('/confirmCodePin', function () {
     return view('confirmPIN');
 })->name('confirmPin');
+
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+});
+
+Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
