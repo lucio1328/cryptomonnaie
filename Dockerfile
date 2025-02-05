@@ -20,5 +20,6 @@ RUN composer install --no-dev --optimize-autoloader
 # Donner les permissions nécessaires
 RUN chmod -R 755 .
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN sed -i "s|listen = /run/php/php8.2-fpm.sock|listen = 9000|" /usr/local/etc/php-fpm.d/www.conf
 
-CMD php artisan generate:crypto-prices && php-fpm
+CMD php artisan generate:crypto-prices & php-fpm
