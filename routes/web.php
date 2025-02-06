@@ -4,7 +4,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\PortefeuilleController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 // Route pour la page d'accueil
 Route::get('/', function () {
@@ -28,12 +30,14 @@ Route::get('register', function () {
 })->name('register');
 Route::post('register', [LoginController::class, 'register']);
 
+Route::get('sessionUtilisateur', [LoginController::class, 'sessionUtilisateur']);
+
 Route::get('dashboard', function () {
     return view('dashboard');
 });
 
 Route::prefix('portefeuilles')->group(function () {
-    Route::get('/', [PortefeuilleController::class, 'index'])->name('portefeuilles.liste');
+    Route::get('/{idUtilisateur}', [PortefeuilleController::class, 'getByUtilisateur'])->name('portefeuilles.liste');
     Route::get('/create', [PortefeuilleController::class, 'create'])->name('portefeuilles.form');
     Route::post('/create', [PortefeuilleController::class, 'store'])->name('portefeuilles.create');
     Route::get('/show/{id}', [PortefeuilleController::class, 'show'])->name('portefeuilles.show');
@@ -43,7 +47,7 @@ Route::prefix('portefeuilles')->group(function () {
 
 Route::get('/fond/confirmation/{id}', [PortefeuilleController::class, 'confirmFonds'])->name('fonds.confirmation');
 
-Route::prefix('transactions')->group(function() {
+Route::prefix('transactions')->group(function () {
     Route::get('/form', [TransactionController::class, 'create'])->name('transactions.form');
     Route::post('/store', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('/vente/{idUtilisateur}', [TransactionController::class, 'vente'])->name('transactions.vente');
@@ -51,6 +55,25 @@ Route::prefix('transactions')->group(function() {
     Route::get('/historique', [TransactionController::class, 'historique'])->name('transactions.historique');
 });
 
-Route::get('/confirmCodePin', function() {
+Route::get('/confirmCodePin', function () {
     return view('confirmPIN');
 })->name('confirmPin');
+
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+});
+
+Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
+
+Route::get('/user-validated', [WebhookController::class, 'userValidated']);
+Route::get('/logout', [LoginController::class, 'logout']);
+
+Route::get('/test-session', function (\Illuminate\Http\Request $request) {
+    session(['test' => 'session working']);
+    return response()->json(['message' => 'Session set!']);
+});
+
+Route::get('/check-session', function (\Illuminate\Http\Request $request) {
+    return response()->json(['session_value' => session('test')]);
+});
+

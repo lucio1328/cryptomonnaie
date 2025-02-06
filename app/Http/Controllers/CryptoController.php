@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Crypto;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CryptoController extends Controller
 {
 
-    public function index()
+    public function index(): JsonResponse
     {
         $cryptos = Crypto::all();
-        return view('cryptos.index', compact('cryptos'));
+        return response()->json([
+            'success' => true,
+            'data' => $cryptos
+        ], 200);
     }
 }

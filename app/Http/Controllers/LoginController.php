@@ -15,68 +15,111 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
             // Appel à l'API Java pour vérifier les identifiants
             $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/check-login', [
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
             ]);
+
             $data = $response->json();
-            // Si la réponse est réussie
+
             if ($response->successful()) {
-
-                // Extraire les informations utilisateurreturn redirect()->route('confirmPin')->with('success', $message);
-                $utilisateur = $data['data'];
-                $message = $data['message'];
-
-                // Stocker les données utilisateur dans la session Laravel
+                $user = Utilisateur::where('email', $request->input('email'))->first();
                 session([
-                    'utilisateur_id' => $utilisateur['idUtilisateur'],
-                    'utilisateur_nom' => $utilisateur['nom'],
-                    'utilisateur_email' => $utilisateur['email'],
+                    'user' => $user
                 ]);
-
-                // Rediriger vers le tableau de bord avec un message de succès
-                return redirect()->route('confirmPin')->with('success', $message);
-                // return redirect()->intended('/dashboard')->with('success', $message);
+                return response()->json([
+                    'success' => true,
+                    'message' => $data['message'],
+                    'user' => $data['data'],
+                ], 200);
             }
 
-            // Si une erreur est renvoyée par l'API
-            return back()->withErrors([
-                'email' => $data['error'],
-            ]);
-            dd($response->status(), $response->json());
-
-
+            return response()->json([
+                'success' => false,
+                'error' => $data['error'] ?? 'Identifiants incorrects',
+            ], $response->status());
         } catch (\Exception $e) {
-            // En cas d'erreur de connexion ou d'exception
-            echo($e->getMessage());
-            
+            return response()->json([
+                'success' => false,
+                'error' => 'Une erreur interne est survenue : ' . $e->getMessage(),
+            ], 500);
         }
     }
+
 
 
     public function register(Request $request)
     {
+        try {
+            // Validation des entrées
+            $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email',
+                'password' => 'required|confirmed',
+            ]);
 
-        $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/pre-inscription', [
-            'nom' => $request->input('name'),
-            'email' => $request->input('email'),
-            'motDePasse' => $request->input('password'),
-            'confirmMotDePasse' => $request->input('password_confirmation'),
-        ]);
+            // Appel à l'API Java pour la pré-inscription
+            $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/pre-inscription', [
+                'nom' => $request->input('name'),
+                'email' => $request->input('email'),
+                'motDePasse' => $request->input('password'),
+                'confirmMotDePasse' => $request->input('password_confirmation'),
+            ]);
 
-        if ($response->successful()) {
-            return redirect()
-                ->route('register')
-                ->with('success', 'Pré-inscription réussie. Vérifiez votre email pour la validation.');
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pré-inscription réussie. Vérifiez votre email pour la validation.',
+                ], 200);
+            }
+
+            return response()->json([
+                'success' => false,
+                's' => 'Échec de la pré-inscription : ' . $response->body(),
+            ], $response->status());
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Une erreur interne est survenue : ' . $e->getMessage(),
+            ], 500);
         }
-
-        return redirect()
-            ->route('register')
-            ->with('error', 'Échec de la pré-inscription : ' . $response->body());
     }
 
+    public function logout()
+    {
+        // Vider la session
+        session()->flush();
+
+        // Optionnel : Supprimer le cookie de session
+        session()->forget('laravel_session');
+
+        // Rediriger vers la page d'accueil ou une page de connexion
+        return redirect('/');
+    }
+
+    public function sessionUtilisateur()
+    {
+        $userData = session('user');
+
+        if ($userData) {
+            return response()->json([
+                'success' => true,
+                'data' => $userData
+            ], 200);
+        } else {
+            // Si aucune donnée n'est trouvée dans la session, retourner une erreur
+            return response()->json([
+                'success' => false,
+                'error' => 'Aucune donnée d\'utilisateur trouvée dans la session.'
+            ], 404); // Code HTTP 404 pour données non trouvées
+        }
+    }
 
 
 }
