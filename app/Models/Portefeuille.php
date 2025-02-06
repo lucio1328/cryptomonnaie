@@ -33,5 +33,10 @@ class Portefeuille extends Model
     {
         return $this->belongsTo(Crypto::class, 'id_cryptos');
     }
+
+    public static function getByUtilisateurr($id_utilisateur)
+    {
+        return Portefeuille::where('id_utilisateur', $id_utilisateur)->get();
+    }
 }
 

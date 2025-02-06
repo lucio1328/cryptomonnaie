@@ -111,6 +111,30 @@ class PortefeuilleController extends Controller
         return response()->json($portefeuille);
     }
 
+    public function getByUtilisateur($id)
+    {
+        try {
+            $portefeuilles = Portefeuille::getByUtilisateurr($id);
+
+            if ($portefeuilles->isEmpty()) {
+                return response()->json([
+                    'message' => 'Aucun portefeuille trouvé.'
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Liste des portefeuilles récupérée avec succès.',
+                'portefeuilles' => $portefeuilles
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erreur lors de la récupération des portefeuilles.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function create()
     {
         $cryptos = Crypto::all();

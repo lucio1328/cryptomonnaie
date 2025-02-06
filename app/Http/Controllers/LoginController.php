@@ -28,6 +28,10 @@ class LoginController extends Controller
             $data = $response->json();
 
             if ($response->successful()) {
+                $user = Utilisateur::where('email', $request->input('email'))->first();
+                session([
+                    'user' => $user
+                ]);
                 return response()->json([
                     'success' => true,
                     'message' => $data['message'],
@@ -98,6 +102,23 @@ class LoginController extends Controller
         return redirect('/');
     }
 
+    public function sessionUtilisateur()
+    {
+        $userData = session('user');
+
+        if ($userData) {
+            return response()->json([
+                'success' => true,
+                'data' => $userData
+            ], 200);
+        } else {
+            // Si aucune donnée n'est trouvée dans la session, retourner une erreur
+            return response()->json([
+                'success' => false,
+                'error' => 'Aucune donnée d\'utilisateur trouvée dans la session.'
+            ], 404); // Code HTTP 404 pour données non trouvées
+        }
+    }
 
 
 }

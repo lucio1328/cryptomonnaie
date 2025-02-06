@@ -30,12 +30,14 @@ Route::get('register', function () {
 })->name('register');
 Route::post('register', [LoginController::class, 'register']);
 
+Route::get('sessionUtilisateur', [LoginController::class, 'sessionUtilisateur']);
+
 Route::get('dashboard', function () {
     return view('dashboard');
 });
 
 Route::prefix('portefeuilles')->group(function () {
-    Route::get('/', [PortefeuilleController::class, 'index'])->name('portefeuilles.liste');
+    Route::get('/{idUtilisateur}', [PortefeuilleController::class, 'getByUtilisateur'])->name('portefeuilles.liste');
     Route::get('/create', [PortefeuilleController::class, 'create'])->name('portefeuilles.form');
     Route::post('/create', [PortefeuilleController::class, 'store'])->name('portefeuilles.create');
     Route::get('/show/{id}', [PortefeuilleController::class, 'show'])->name('portefeuilles.show');
