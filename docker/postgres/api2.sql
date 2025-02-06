@@ -88,3 +88,14 @@ CREATE TABLE fonds(
    FOREIGN KEY(Id_type_fonds) REFERENCES type_fonds(Id_type_fonds),
    FOREIGN KEY(Id_statut) REFERENCES statut(Id_statut)
 );
+
+CREATE TABLE commission(
+   Id_commission SERIAL,
+   Id_cryptos INTEGER,
+   Id_type_transaction INTEGER,
+   pourcentage NUMERIC(10,5) NOT NULL,
+   daty DATE NOT NULL,
+   PRIMARY KEY(Id_commission),
+   FOREIGN KEY(Id_cryptos) REFERENCES cryptos(Id_cryptos),
+   FOREIGN KEY(Id_type_transaction) REFERENCES type_transaction(Id_type_transaction)
+);

@@ -7,6 +7,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
+use App\Http\Controllers\CommissionController;
 
 // Route pour la page d'accueil
 Route::get('/', function () {
@@ -77,3 +78,10 @@ Route::get('/check-session', function (\Illuminate\Http\Request $request) {
     return response()->json(['session_value' => session('test')]);
 });
 
+Route::prefix('commissions')->controller(CommissionController::class)->group(function () {
+    Route::get('/', 'index')->name('listeCommission');
+    Route::post('/', 'store')->name('createCommission');
+    Route::get('/{id}', 'show')->name('detailsCommission');
+    Route::post('/{id}/update', 'update')->name('updateCommission');
+    Route::post('/{id}/delete', 'destroy')->name('deleteCommission');
+});

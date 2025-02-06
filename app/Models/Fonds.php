@@ -44,4 +44,25 @@ class Fonds extends Model
     {
         return $this->belongsTo(Statut::class, 'id_statut');
     }
+
+    public static function getFondsEnAttente()
+    {
+        return self::whereHas('statut', function ($query) {
+            $query->where('libelle', 'en attente');
+        })->get();
+    }
+
+    public function updateStatut($nouveauStatut)
+    {
+        $statut = Statut::where('libelle', $nouveauStatut)->first();
+
+        if (!$statut) {
+            throw new \Exception("Le statut '{$nouveauStatut}' n'existe pas.");
+        }
+
+        $this->id_statut = $statut->id_statut;
+        $this->save();
+
+        return $this;
+    }
 }
