@@ -21,7 +21,7 @@ class Fonds extends Model
         'montant_euro',
         'montant_ariary',
         'daty',
-        'id_portefeuilles',
+        'id_utilisateur',
         'id_type_fonds',
         'id_statut',
     ];
@@ -30,9 +30,9 @@ class Fonds extends Model
         'daty' => 'date',
     ];
 
-    public function portefeuille()
+    public function utilisateur()
     {
-        return $this->belongsTo(Portefeuille::class, 'id_portefeuilles');
+        return $this->belongsTo(Utilisateur::class, 'id_utilisateur');
     }
 
     public function typeFonds()
