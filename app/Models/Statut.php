@@ -16,5 +16,6 @@ class Statut extends Model
     protected $fillable = [
         'libelle',
     ];
+    
     public $timestamps = false;
 }

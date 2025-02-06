@@ -5,6 +5,7 @@ use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\PortefeuilleController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CommissionController;
 
 // Route pour la page d'accueil
 Route::get('/', function () {
@@ -54,3 +55,11 @@ Route::prefix('transactions')->group(function() {
 Route::get('/confirmCodePin', function() {
     return view('confirmPIN');
 })->name('confirmPin');
+
+Route::prefix('commissions')->controller(CommissionController::class)->group(function () {
+    Route::get('/', 'index')->name('listeCommission');
+    Route::post('/', 'store')->name('createCommission'); 
+    Route::get('/{id}', 'show')->name('detailsCommission'); 
+    Route::post('/{id}/update', 'update')->name('updateCommission'); 
+    Route::post('/{id}/delete', 'destroy')->name('deleteCommission'); 
+});
