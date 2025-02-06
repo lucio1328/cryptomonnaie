@@ -43,7 +43,7 @@ class PortefeuilleController extends Controller
             ->with('success', 'Opération de fonds validée et solde mis à jour avec succès.');
     }
 
-    public function storeFonds(Request $request, $id)
+    public function storeFonds(Request $request)
     {
         try {
             // Validation des données
@@ -57,12 +57,23 @@ class PortefeuilleController extends Controller
             $exchangeRateUsd = 0.00024;
             $exchangeRateEuro = 0.00022;
 
+
             // Conversion des montants
             $montant_usd = $validatedData['montant'] * $exchangeRateUsd;
             $montant_euro = $validatedData['montant'] * $exchangeRateEuro;
 
-            // Vérifier si le portefeuille existe
-            $portefeuille = Portefeuille::findOrFail($id);
+            // recuperer l'utilisateur
+            $user = session('user');
+
+            if ($validatedData['type_operation'] == 2) {
+                $fondTotal = Fonds::fondTotal($user->id_utilisateur);
+                if ($validatedData['montant'] > $fondTotal['ariary']) {
+                    return response()->json([
+                        'message' => 'Votre solde est insuffisant',
+                        "success" => false
+                    ]);
+                }
+            }
 
             // Création du fonds
             $fonds = Fonds::create([
@@ -70,27 +81,31 @@ class PortefeuilleController extends Controller
                 'montant_euro' => $montant_euro,
                 'montant_ariary' => $validatedData['montant'],
                 'daty' => $validatedData['daty'],
-                'id_portefeuilles' => $id,
+                'id_utilisateur' => $user->id_utilisateur,
                 'id_type_fonds' => $validatedData['type_operation'],
                 'id_statut' => 1, // En attente de validation
             ]);
 
-            // Envoi de l'email de confirmation
-            $user = $portefeuille->utilisateur;
-            Mail::to($user->email)->send(new FondsConfirmationMail($user, $fonds));
 
             // Réponse JSON (201 Created)
             return response()->json([
-                'message' => 'Fonds en attente de validation par email',
-                'fonds' => $fonds
+                'message' => 'Succes, en attente de validation',
+                'fonds' => $fonds,
+                "success" => true
             ], 201);
 
         } catch (ValidationException $e) {
             // Erreurs de validation (422 Unprocessable Entity)
-            return response()->json(['errors' => $e->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             // Autres erreurs (500 Internal Server Error)
-            return response()->json(['error' => 'Une erreur est survenue'], 500);
+            return response()->json([
+                'error' => 'Une erreur est survenue ' + $e->getMessage(),
+                'success' => false
+            ], 500);
         }
     }
 

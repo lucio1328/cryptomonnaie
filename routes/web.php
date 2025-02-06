@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FondController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\PortefeuilleController;
@@ -42,7 +43,7 @@ Route::prefix('portefeuilles')->group(function () {
     Route::post('/create', [PortefeuilleController::class, 'store'])->name('portefeuilles.create');
     Route::get('/show/{id}', [PortefeuilleController::class, 'show'])->name('portefeuilles.show');
     Route::get('/fonds/{id}', [PortefeuilleController::class, 'gererFonds'])->name('portefeuilles.fonds');
-    Route::post('/fonds/{id}', [PortefeuilleController::class, 'storeFonds'])->name('portefeuilles.storeFonds');
+    Route::post('/fonds', [PortefeuilleController::class, 'storeFonds'])->name('portefeuilles.storeFonds');
 });
 
 Route::get('/fond/confirmation/{id}', [PortefeuilleController::class, 'confirmFonds'])->name('fonds.confirmation');
@@ -76,4 +77,6 @@ Route::get('/test-session', function (\Illuminate\Http\Request $request) {
 Route::get('/check-session', function (\Illuminate\Http\Request $request) {
     return response()->json(['session_value' => session('test')]);
 });
+
+Route::get('/get-fond-utilisateur', [FondController::class, 'getFond']);
 

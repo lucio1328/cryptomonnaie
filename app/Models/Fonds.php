@@ -44,4 +44,38 @@ class Fonds extends Model
     {
         return $this->belongsTo(Statut::class, 'id_statut');
     }
+
+    public static function fondTotal($idUtilisateur)
+    {
+        // Récupérer tous les fonds de cet utilisateur
+        $fonds = self::where('id_utilisateur', $idUtilisateur)
+             ->where('id_statut', 2)
+             ->get();
+
+        // Calcul du total des dépôts
+        $totalDepots = $fonds->where('id_type_fonds', 1)->reduce(function ($carry, $item) {
+            return [
+                'usd' => $carry['usd'] + $item->montant_usd,
+                'euro' => $carry['euro'] + $item->montant_euro,
+                'ariary' => $carry['ariary'] + $item->montant_ariary,
+            ];
+        }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
+
+        // Calcul du total des retraits
+        $totalRetraits = $fonds->where('id_type_fonds', 2)->reduce(function ($carry, $item) {
+            return [
+                'usd' => $carry['usd'] + $item->montant_usd,
+                'euro' => $carry['euro'] + $item->montant_euro,
+                'ariary' => $carry['ariary'] + $item->montant_ariary,
+            ];
+        }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
+
+        // Calcul du solde final
+        return [
+            'usd' => $totalDepots['usd'] - $totalRetraits['usd'],
+            'euro' => $totalDepots['euro'] - $totalRetraits['euro'],
+            'ariary' => $totalDepots['ariary'] - $totalRetraits['ariary'],
+        ];
+    }
+
 }
