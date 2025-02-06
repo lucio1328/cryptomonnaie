@@ -20,8 +20,7 @@ class LoginController extends Controller
                 'password' => 'required',
             ]);
 
-            // Appel à l'API Java pour vérifier les identifiants
-            $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/check-login', [
+            $response = Http::asForm()->post('http://localhost:8081/api/check-login', [
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
             ]);
@@ -65,7 +64,7 @@ class LoginController extends Controller
             ]);
 
             // Appel à l'API Java pour la pré-inscription
-            $response = Http::asForm()->post(env('SPRING_BOOT_URL') . '/api/pre-inscription', [
+            $response = Http::asForm()->post('http://localhost:8081/api/pre-inscription', [
                 'nom' => $request->input('name'),
                 'email' => $request->input('email'),
                 'motDePasse' => $request->input('password'),
