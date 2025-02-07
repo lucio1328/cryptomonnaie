@@ -3,62 +3,104 @@
 namespace App\Http\Controllers;
 
 use App\Models\Crypto;
+use App\Models\Fonds;
 use App\Models\Portefeuille;
 use App\Models\Transaction;
 use App\Models\TypeTransaction;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use League\Config\Exception\ValidationException;
 
 class TransactionController extends Controller
 {
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'quantite' => 'required|integer|min:1',
-            'date_transaction' => 'required|date',
-            'id_cryptos' => 'required|exists:cryptos,id_cryptos',
-            'id_type_transaction' => 'required|exists:type_transaction,id_type_transaction',
-            'id_utilisateur' => 'required|exists:utilisateur,id_utilisateur',
-        ]);
-        $cryptos = Crypto::findOrFail($validated['id_cryptos']);
-        $portefeuille = Portefeuille::where('id_cryptos', $validated['id_cryptos'])
+        $test = "";
+        try {
+            $validated = $request->validate([
+                'quantite' => 'required|integer|min:1',
+                'date_transaction' => 'required|date',
+                'id_cryptos' => 'required|exists:cryptos,id_cryptos',
+                'id_type_transaction' => 'required|exists:type_transaction,id_type_transaction',
+                'id_utilisateur' => 'required|exists:utilisateur,id_utilisateur',
+            ]);
+
+            $cryptos = Crypto::findOrFail($validated['id_cryptos']);
+            $portefeuille = Portefeuille::where('id_cryptos', $validated['id_cryptos'])
                 ->where('id_utilisateur', $validated['id_utilisateur'])
                 ->first();
 
-        if ($validated['id_type_transaction'] == 1) { //vente
-            if (!$portefeuille) {
-                return redirect()->back()->withErrors(['portefeuille' => 'Aucun portefeuille trouvé pour cet utilisateur et cette cryptomonnaie.']);
+            $vola = Fonds::fondTotal($validated['id_utilisateur']);
+
+            if ($validated['id_type_transaction'] == 1) { // Vente
+                if (!$portefeuille) {
+                    return response()->json([
+                        'message' => 'Aucun portefeuille trouvé pour cet utilisateur et cette cryptomonnaie.',
+                        'success' => false
+                    ]);
+                }
+
+                if ($portefeuille->solde < $validated['quantite']) {
+                    return response()->json([
+                        'message' => 'Quantite insuffisant dans le portefeuille.',
+                        'success' => false
+                    ]);
+                }
+
+                $portefeuille->solde -= $validated['quantite'];
+                $portefeuille->save();
+            } else { // Achat
+                if (!$portefeuille) {
+                    return response()->json(['message' => 'Aucun portefeuille trouvé pour cet utilisateur et cette cryptomonnaie.'], 404);
+                }
+
+                // Verifier le fond d'abord:
+
+                if ($vola['ariary'] < $validated['quantite'] * $cryptos->prix_actuel) {
+                    return response()->json([
+                        'message' => 'Fond insuffisant',
+                        'success' => false
+                    ]);
+                }
+
+                $portefeuille->solde += $validated['quantite'];
+                $portefeuille->save();
             }
 
-            if ($portefeuille->solde < $validated['quantite']) {
-                return redirect()->back()->withErrors(['solde' => 'Solde insuffisant dans le portefeuille.']);
-            }
+            $transaction = new Transaction();
+            $transaction->quantite = $validated['quantite'];
+            $transaction->prix = $validated['quantite'] * $cryptos->prix_actuel;
+            $transaction->date_transaction = $validated['date_transaction'];
+            $transaction->id_cryptos = $validated['id_cryptos'];
+            $transaction->id_type_transaction = $validated['id_type_transaction'];
+            $transaction->id_utilisateur = $validated['id_utilisateur'];
+            $transaction->save();
 
-            $portefeuille->solde -= $validated['quantite'];
+            return response()->json([
+                'message' => 'Transaction créée avec succès' . $test,
+                'transaction' => $transaction,
+                'success' => true
+            ], 201);
 
-            $portefeuille->save();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'errors' => $e->getMessage(),
+                'success' => false
+            ], 422);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Ressource non trouvée.',
+                'success' => false
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Une erreur est survenue.',
+                'details' => $e->getMessage(),
+                'success' => false
+            ], 500);
         }
-        else { //achat
-            if($portefeuille->valeur < $validated['quantite'] * $cryptos->prix_actuel) {
-                return redirect()->back()->withErrors(['valeur' => 'Valeur insuffisante dans le portefeuille.']);
-            }
-
-            $portefeuille->solde += $validated['quantite'];
-
-            $portefeuille->save();
-        }
-
-        $transaction = new Transaction();
-        $transaction->quantite = $validated['quantite'];
-        $transaction->prix = $validated['quantite'] * $cryptos->prix_actuel;
-        $transaction->date_transaction = $validated['date_transaction'];
-        $transaction->id_cryptos = $validated['id_cryptos'];
-        $transaction->id_type_transaction = $validated['id_type_transaction'];
-        $transaction->id_utilisateur = $validated['id_utilisateur'];
-        $transaction->save();
-
-        return redirect()->route('transactions.form')->with('success', 'Transaction créée avec succès');
     }
 
     public function create()
@@ -66,7 +108,7 @@ class TransactionController extends Controller
         $cryptos = Crypto::all();
         $typeTransactions = TypeTransaction::all();
 
-        return view('transactions.create', compact('typeTransactions','cryptos'));
+        return view('transactions.create', compact('typeTransactions', 'cryptos'));
     }
 
     public function vente($idUtilisateur)
@@ -87,7 +129,8 @@ class TransactionController extends Controller
         return view('transactions.achat', compact('achats'));
     }
 
-    public function historique() {
+    public function historique()
+    {
         $transactions = Transaction::all();
 
         return view('transactions.historique', compact('transactions'));

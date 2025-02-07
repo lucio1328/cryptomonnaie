@@ -49,33 +49,46 @@ class Fonds extends Model
     {
         // Récupérer tous les fonds de cet utilisateur
         $fonds = self::where('id_utilisateur', $idUtilisateur)
-             ->where('id_statut', 2)
-             ->get();
+            ->where('id_statut', 2)
+            ->get();
 
-        // Calcul du total des dépôts
-        $totalDepots = $fonds->where('id_type_fonds', 1)->reduce(function ($carry, $item) {
+        $sommeTransaction = Transaction::montantTotal($idUtilisateur);
+
+
+        if ($fonds) {
+            // Calcul du total des dépôts
+            $totalDepots = $fonds->where('id_type_fonds', 1)->reduce(function ($carry, $item) {
+                return [
+                    'usd' => $carry['usd'] + $item->montant_usd,
+                    'euro' => $carry['euro'] + $item->montant_euro,
+                    'ariary' => $carry['ariary'] + $item->montant_ariary,
+                ];
+            }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
+
+            // Calcul du total des retraits
+            $totalRetraits = $fonds->where('id_type_fonds', 2)->reduce(function ($carry, $item) {
+                return [
+                    'usd' => $carry['usd'] + $item->montant_usd,
+                    'euro' => $carry['euro'] + $item->montant_euro,
+                    'ariary' => $carry['ariary'] + $item->montant_ariary,
+                ];
+            }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
+
+
+            // Calcul du solde final
             return [
-                'usd' => $carry['usd'] + $item->montant_usd,
-                'euro' => $carry['euro'] + $item->montant_euro,
-                'ariary' => $carry['ariary'] + $item->montant_ariary,
+                'usd' => $totalDepots['usd'] - $totalRetraits['usd'] + $sommeTransaction * Devise::USD,
+                'euro' => $totalDepots['euro'] - $totalRetraits['euro'] + $sommeTransaction * Devise::USD,
+                'ariary' => $totalDepots['ariary'] - $totalRetraits['ariary'] + $sommeTransaction,
             ];
-        }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
-
-        // Calcul du total des retraits
-        $totalRetraits = $fonds->where('id_type_fonds', 2)->reduce(function ($carry, $item) {
+        } else {
             return [
-                'usd' => $carry['usd'] + $item->montant_usd,
-                'euro' => $carry['euro'] + $item->montant_euro,
-                'ariary' => $carry['ariary'] + $item->montant_ariary,
+                'usd' => 0 + $sommeTransaction * Devise::USD,
+                'euro' => 0 + $sommeTransaction * Devise::USD,
+                'ariary' => 0 + $sommeTransaction,
             ];
-        }, ['usd' => 0, 'euro' => 0, 'ariary' => 0]);
+        }
 
-        // Calcul du solde final
-        return [
-            'usd' => $totalDepots['usd'] - $totalRetraits['usd'],
-            'euro' => $totalDepots['euro'] - $totalRetraits['euro'],
-            'ariary' => $totalDepots['ariary'] - $totalRetraits['ariary'],
-        ];
     }
 
 }

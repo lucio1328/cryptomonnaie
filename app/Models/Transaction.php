@@ -41,4 +41,24 @@ class Transaction extends Model
     {
         return $this->belongsTo(TypeTransaction::class, 'id_type_transaction');
     }
+
+    public static function montantTotal($idUtilisateur)
+    {
+        // Récupérer toutes les transactions de l'utilisateur
+        $transactions = self::where('id_utilisateur', $idUtilisateur)->get();
+
+        // Calcul du total des achats
+        $totalAchats = $transactions->where('id_type_transaction', 2)->reduce(function ($carry, $item) {
+            return $carry + ($item->quantite * $item->prix);
+        }, 0);
+
+        // Calcul du total des ventes
+        $totalVentes = $transactions->where('id_type_transaction', 1)->reduce(function ($carry, $item) {
+            return $carry + ($item->quantite * $item->prix);
+        }, 0);
+
+        // Calcul du solde final (montant possédé)
+        return $totalVentes - $totalAchats;
+    }
+
 }

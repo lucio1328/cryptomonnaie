@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\FondsConfirmationMail;
+use App\Models\Devise;
 use App\Models\Portefeuille;
 use App\Models\Crypto;
 use App\Models\Fonds;
@@ -53,14 +54,10 @@ class PortefeuilleController extends Controller
                 'type_operation' => 'required|exists:type_fonds,id_type_fonds',
             ]);
 
-            // Taux de change
-            $exchangeRateUsd = 0.00024;
-            $exchangeRateEuro = 0.00022;
-
 
             // Conversion des montants
-            $montant_usd = $validatedData['montant'] * $exchangeRateUsd;
-            $montant_euro = $validatedData['montant'] * $exchangeRateEuro;
+            $montant_usd = $validatedData['montant'] * Devise::USD;
+            $montant_euro = $validatedData['montant'] * Devise::EURO;
 
             // recuperer l'utilisateur
             $user = session('user');

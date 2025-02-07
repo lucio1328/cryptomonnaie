@@ -36,7 +36,7 @@ class Portefeuille extends Model
 
     public static function getByUtilisateurr($id_utilisateur)
     {
-        return Portefeuille::where('id_utilisateur', $id_utilisateur)->get();
+        return Portefeuille::with('crypto')->where('id_utilisateur', $id_utilisateur)->get();
     }
 }
 
